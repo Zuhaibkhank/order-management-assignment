@@ -11,12 +11,22 @@ app.use(cors());
 app.use(helmet());
 app.use(morgan("dev"));
 
-// Test Route
+// Routes
+const orderRoutes = require("./routes/orderRoutes");
+app.use("/api/orders", orderRoutes);
+
 app.get("/", (req, res) => {
-    res.status(200).json({
+    res.json({
         success: true,
         message: "Order Management API is Running 🚀"
     });
 });
 
+const schedulerRoutes =
+require("./routes/schedulerRoutes");
+
+app.use(
+    "/api/scheduler",
+    schedulerRoutes
+);
 module.exports = app;
