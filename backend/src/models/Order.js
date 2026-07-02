@@ -49,11 +49,10 @@ const orderSchema = new mongoose.Schema(
 );
 
 // Auto-generate Order ID
-orderSchema.pre("save", function (next) {
+orderSchema.pre("save", function () {
   if (!this.orderId) {
     this.orderId = `ORD-${Date.now()}`;
   }
-  next();
 });
 
 module.exports = mongoose.model("Order", orderSchema);

@@ -137,6 +137,8 @@ const updateOrderStatus = async (req, res) => {
 
         await order.save();
 
+        
+
         await StatusHistory.create({
 
             orderId: order._id,
@@ -152,38 +154,30 @@ const updateOrderStatus = async (req, res) => {
 
         });
 
-    } catch(error){
+    } catch (error) {
 
-        res.status(500).json({
+    console.error("PATCH ERROR:");
+    console.error(error);
+    console.error(error.stack);
 
-            success:false,
-            message:error.message,
+    res.status(500).json({
+        success: false,
+        message: error.message,
+    });
 
-        });
-
-    }
-
+}
 };
 
-// Update Payment Status
-const updatePaymentStatus = async (req, res) => {
+const getStatusHistory = async (req, res) => {
     try {
-        const order = await Order.findById(req.params.id);
-
-        if (!order) {
-            return res.status(404).json({
-                success: false,
-                message: "Order not found",
-            });
-        }
-
-        order.paymentStatus = req.body.paymentStatus;
-
-        await order.save();
+        const history = await StatusHistory.find({
+            orderId: req.params.id,
+        }).sort({ createdAt: -1 });
 
         res.status(200).json({
             success: true,
-            data: order,
+            count: history.length,
+            data: history,
         });
 
     } catch (error) {
@@ -194,10 +188,54 @@ const updatePaymentStatus = async (req, res) => {
     }
 };
 
+// Update Payment Status
+const updatePaymentStatus = async (req, res) => {
+
+    try {
+
+        const order = await Order.findById(req.params.id);
+
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: "Order not found",
+            });
+        }
+
+        const updatedOrder = await Order.findByIdAndUpdate(
+            req.params.id,
+            {
+                paymentStatus: req.body.paymentStatus,
+            },
+            {
+                new: true,
+                runValidators: true,
+            }
+        );
+
+        res.status(200).json({
+            success: true,
+            data: updatedOrder,
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+
+    }
+
+};
+
 module.exports = {
     createOrder,
     getAllOrders,
     getOrderById,
     updateOrderStatus,
     updatePaymentStatus,
+    getStatusHistory,
 };

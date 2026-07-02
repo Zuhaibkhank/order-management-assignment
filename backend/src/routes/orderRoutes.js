@@ -8,6 +8,7 @@ const {
     getOrderById,
     updateOrderStatus,
     updatePaymentStatus,
+    getStatusHistory,
 } = require("../controllers/orderController");
 
 router
@@ -18,6 +19,10 @@ router
 router
     .route("/:id")
     .get(getOrderById);
+
+router
+    .route("/:id/history")
+    .get(getStatusHistory);
 
 router
     .route("/:id/status")
